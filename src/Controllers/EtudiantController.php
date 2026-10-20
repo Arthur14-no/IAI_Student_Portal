@@ -15,7 +15,7 @@
                         if (!isset($_SESSION['etudiants'])) {
 
                             $_SESSION['etudiants']= [
-                                new Etudiant('IAI0001','ebode', 'salomon', 21, 11, 'G.L'),
+                                new Etudiant('ebode', 'salomon', 21, 11, 'G.L'),
                                 new Etudiant('fouegue', 'erwan', 19, 10, 'S.R'),
                                 new Etudiant('ekobo', 'bernard', 20, 15, 'G.L'),
                                 new Etudiant('ze', 'benjo', 25, 8.5, 'S.R'),

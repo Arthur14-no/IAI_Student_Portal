@@ -18,12 +18,12 @@
                 $page= $_GET['page'];
         }
         else {
-                $page= 'liste';
+                $page= 'listes';
         }
 
 
 
-        if ($page === 'liste') {
+        if ($page === 'listes') {
                 $controller-> Listes();
         }
         elseif ($page === 'admis') {

@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LISTES DES ADMIS</title>
 </head>
-<body>
+<body bgcolor="silver">
 
-    <a href="index.php?page=liste">liste des etudiant</a>
+    <a href="index.php?page=listes">liste des etudiant</a>
     <a href="index.php?page=echoue">Listes des echoues</a>
     
      <h2>ADMIS</h2>

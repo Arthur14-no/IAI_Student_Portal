@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajout nouvelle etudaint</title>
 </head>
-<body>
+<body bgcolor="silver">
     
     <H2>FORMULAIRE D'ENREGISTREMENT ETUDIANTS</H2>
     <form method= "POST" action="index.php?page=creer" >
 
         <p>
             <label for="nom">Nom :</label>
-            <input type="text" name="nom" id="nom" required>
+            <input type="text" name="nom" id="nom" required placeholder="EBODE">
 
             <label for="prenom">Prenom :</label>
-            <input type="text" name="prenom" id="prenom" required><br/><br/>
+            <input type="text" name="prenom" id="prenom" required placeholder="Arthur" ><br/><br/>
 
             <label for="age">Age :</label>
-            <input type="number" name="age" id="age" require><br/><br/>
+            <input type="number" name="age" id="age" require placeholder="EXP: 19" ><br/><br/>
 
             <label for="filiere">Selectinner la filiere :</label>
             <select name="filiere" id="filiere">
@@ -29,7 +29,7 @@
             </select><br/><br/>
 
             <br/><label for="moyenne">Saisir la moyenne :</label>
-            <input type="number" name="moyenne" id="moyenne" min="0" max="20" step="0.01" required><br/>
+            <input type="number" name="moyenne" id="moyenne" min="0" max="20" step="0.01" required placeholder="EXP: 10.75"><br/>
 
            <br/> <input type="submit" value="Enregister">
         </p>

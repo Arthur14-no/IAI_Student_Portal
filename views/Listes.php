@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portail Etudiants</title>
 </head>
-<body>
+<body bgcolor="silver">
     
     <nav>
         <a href="index.php?page=admis">liste des admis</a>
