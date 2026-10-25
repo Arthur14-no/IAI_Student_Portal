@@ -21,10 +21,10 @@
             <input type="number" name="age" id="age" require placeholder="EXP: 19" ><br/><br/>
 
             <label for="filiere">Selectinner la filiere :</label>
-            <select name="filiere" id="filiere">
+            <select name="filiere" id="filiere" required>
                 <option value="">Selctionner la filiere</option>
-                <option value="G.L">S.R</option>
-                <option value="S.R">G.L</option>
+                <option value="G.L">G.L</option>
+                <option value="S.R">S.R</option>
                 <option value="S.E">S.E</option>
             </select><br/><br/>
 

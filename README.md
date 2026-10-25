@@ -2,7 +2,7 @@
 
 Projet PHP de gestions des etudaints de IAI.
 
-## Fpnctionnalités actuelles (v1-push)
+## Fonctionnalités actuelles (v1-push)
 - Ajouter un etudiant
 - afficher la lieste des admis et echoues
 

@@ -5,7 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajout nouvelle etudaint</title>
 </head>
-<body bgcolor="silver">
+<body bgcolor="silver" align="center">
+
+    <h2>RECHERCHE PAR NOM/PRENOM</h2>
+    <form action="index.php" method="GET">
+
+        <p>
+            <input type="hidden" name="page" id="page" value="list">
+            <fieldset>
+                <legend>recherches par nom/preniom</legend>
+
+                <input type="text" name="q" id="q" value="<?= isset($_GET['q']) ? $_GET['q'] : '' ?>">
+            </fieldset>
+        </p>
+
+    </form>
     
     <H2>FORMULAIRE D'ENREGISTREMENT ETUDIANTS</H2>
     <form method= "POST" action="index.php?page=creer" >
