@@ -197,7 +197,9 @@
                         $matricule= $_GET['matricule'] ?? '';
 
                         if ($matricule === '') {
-                            die("Matricule invalide");
+                            $_SESSION['message'] = "Matricule invalide";
+                            header('Location: index.php?page=listes');
+                            exit;
                         }
 
                         $stmt= $this-> db-> prepare("DELETE FROM etudiants WHERE matricule = ?");
