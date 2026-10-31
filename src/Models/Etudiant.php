@@ -3,25 +3,32 @@ declare(strict_types=1); //permet de rendre strict le lutilisation des variables
 
 namespace App\Models; //ici il remplace 'require' ou 'include' grace au compser.
 
-
+// cretion de la classe etudiant
 class Etudiant{
     private static int $compteur= 1; //pour toute la classse.
-    private string $nom;
-    private string $prenom;
-    private int $age;
-    private string $matricul;
-    private float $moyenne;
-    private string $filier;
+  
 
     // cretaions des du contructeurs pour linitialisation des objects
-    public function __construct(string $nom, string $prenom, int $age, float $moyenne, string $filier){
-        $this->nom = $nom;
-        $this->prenom =$prenom;
-        $this->age = $age;
-       // $this->matricul= 'IAI' .rand(0001,9999);
-        $this->matricul= 'IAI' .str_pad((string)self::$compteur, 4, '0', STR_PAD_LEFT); self::$compteur++;
-        $this->moyenne= $moyenne;
-        $this->filier= $filier;
+    public function __construct(
+        private string $nom,
+        private string $prenom,
+        private int $age,
+        private float $moyenne,
+        private string $filier,
+        private string $matricul= ''
+    ){
+       
+       /* $this->matricul= 'IAI' .rand(0001,9999);*/
+
+
+       if ($matricul === '' || $matricul === null) {
+        $this-> matricul= 'IAI'. str_pad((string) self::$compteur, 4,'0', STR_PAD_LEFT);
+        self::$compteur++;
+
+       }else {
+        $this-> matricul= $matricul;
+       }
+       
 
        // echo "Etudiant cree ! <br/>";
     }
@@ -53,7 +60,7 @@ class Etudiant{
     }
 
 
-
+    // permet la modification des propieter de la classe etudiants
     public function setNom($newNom): void {
         if (trim($nom) !== ""){
              $this->nom= $newNom;
@@ -75,6 +82,9 @@ class Etudiant{
     
     public function setMoyenne($newMoyenne){
         if ($newMoyenne >=0 && $newMoyenne <=20) {
+
+            throw new \InvalidArgumentException("entre 0 et 20");
+            
             $this->moyenne= $newMoyenne; 
         }
     }
@@ -92,7 +102,7 @@ class Etudiant{
             return " Vous avez echouer ! <br/>";
         }*/
         return match (true) {
-            $this-> moyenne <10 => "Vous avvez echoué !",
+            $this-> moyenne <10 => "Vous avez echoué !",
             $this-> moyenne <12 => "vous avez reussis, assez bien",
             $this-> moyenne <14 => "vous avez reussis, bien",
             $this-> moyenne <16 => "vous avez reussis, tres bien",
@@ -100,6 +110,21 @@ class Etudiant{
             $this-> moyenne <=20 => "vous avez reussis, exellent",
         };
     }
+
+   /* public function compterTous(): int{
+        $stmt = $this-> db-> query("SELECT COUNT(*) as total FROM etudiants");
+
+        return(int) $stmt-> fetch()['total'];
+    }
+
+    public function getPagine(int $limit, int $offset): array{
+        $stmt= $this-> db-> prepare("SELECT * FROM etudiants ORDER BY moyenne DESC LIMIT :limit OFFSET :offset");
+        $stmt-> bindvalue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt-> bindvalue(':offset', $offset, \PDO::PARAM_INT);
+        $stmt-> execute();
+
+        return $stmt-> fetchALL();
+    }*/
 }
 
 ?>

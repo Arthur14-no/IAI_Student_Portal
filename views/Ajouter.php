@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajout nouvelle etudaint</title>
 </head>
-<body bgcolor="silver">
+<body bgcolor="silver" align="center">
     
     <H2>FORMULAIRE D'ENREGISTREMENT ETUDIANTS</H2>
     <form method= "POST" action="index.php?page=creer" >
@@ -26,6 +26,7 @@
                 <option value="G.L">G.L</option>
                 <option value="S.R">S.R</option>
                 <option value="S.E">S.E</option>
+
             </select><br/><br/>
 
             <br/><label for="moyenne">Saisir la moyenne :</label>
@@ -35,7 +36,14 @@
         </p>
     </form>
 
-    <a href="index.php?page=listes">liste des etudiants</a>
+     <nav>
+       <p style="margin-top:20px; text-align:center;">
+        <a href="index.php?page=admis" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white; ">liste des admis</a>
+        <a href="index.php?page=echoue" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Listes des echoues</a>
+        <a href="index.php?page=listes" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;" >liste des etudiants</a>
+     </p>
+     </nav>
+        
 
 </body>
 </html>

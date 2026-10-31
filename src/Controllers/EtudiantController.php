@@ -1,8 +1,12 @@
 <?php
      declare(strict_types=1);
 
+     namespace App\controllers;
+
+     use App\config\Database;
+
                 //ici on renseigne ladresse du fichier grace au composer.
-                namespace App\controllers;
+              
 
 
                 //ici on precise quil utilise la classe etudiant.
@@ -16,8 +20,7 @@
 
                 public function __construct(){
                     
-                    require __DIR__. '/../config/Database.php';
-                    $database= new \Database();
+                    $database= new Database();
                     $this-> db =$database->getConnexion();
                 }
 
@@ -43,49 +46,97 @@
                 }
                         
                 
-                    public function Listes(): void{
-                        $etudiants= $this->getEtudiants();
-                        $stats= $this-> getStat();
+                public function listes(): void { 
+                    // pagination de la liste des etudiants
+                    $pageActuelle = isset($_GET['p']) ? (int)$_GET['p'] : 1; 
+                    if ($pageActuelle < 1) $pageActuelle = 1; 
+                    $parPage = 5; 
 
-                        usort($etudiants, function($e, $b){
-                            return strcmp(strtolower($e-> getNom()), strtolower($b-> getNom()));
-                        });
+                    // compter avec $this->db
+                    $stmtCount = $this-> db-> query("SELECT COUNT(*) as total FROM etudiants");
+                    $totalEtudiants = (int)$stmtCount->fetch()['total'];
+                    $totalPages = (int)ceil($totalEtudiants / $parPage); 
+                    $offset = ($pageActuelle - 1) * $parPage; 
 
-
-                        if (isset($_GET['tri']) && !empty($_GET['tri']) && $_GET['tri']) {
-                            usort($etudiants, function($e, $b){
-
-                                if ($e-> getMoyenne() == $b-> getMoyenne()) {
-                                    return 0;
-                                }
-
-                                return ($e-> getMoyenne() < $b-> getMoyenne()) ? 1 : -1;
-                            });
-                        }
-                            
-
-                        if (isset($_GET['q']) && !empty($_GET['q'])) {
-                            $motCle= strtolower($_GET['q']);
-                            $filtre= array();
-
-                            foreach ($etudiants as $unEtudiant) {
-                                $nomComplet= strtolower($unEtudiant-> getNom(). ' ' .$unEtudiant->  getPrenom());
-
-                                if (strpos($nomComplet, $motCle) !== false  ) {
-                                    $filtre[]= $unEtudiant;
-                                }
-                            }
-
-                            $etudiants= $filtre;
-                        }
-
-
-                        require __DIR__ . '/../../views/Listes.php';
+                    // recuperer 5 étudiants avec $this->db
+                    $stmt = $this->db->prepare("SELECT * FROM etudiants ORDER BY moyenne DESC LIMIT :limit OFFSET :offset");
+                    $stmt->bindValue(':limit', $parPage, \PDO::PARAM_INT);
+                    $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+                    $stmt->execute();
+                    $etudiantsArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                    
+                    //  retransformer les valeur en objets apre lexecution evac la bd 
+                    $etudiants = [];
+                    foreach($etudiantsArray as $row){
+                        $etudiants[]= new \App\Models\Etudiant(
+                        $row['nom'],
+                        $row['prenom'],
+                        (int)$row['age'],
+                        (float)$row['moyenne'] ?? 20,
+                        $row['filiere'] ?? $row['mention'],
+                        $row['matricule']
+                        );
                     }
 
+                    // tri par moyenne
+                    if (isset($_GET['tri']) && $_GET['tri'] === 'moyenne') {
+                        usort($etudiants, function($a, $b){
+                            if ($a->getMoyenne() == $b->getMoyenne()) return 0;
+                            return ($a->getMoyenne() < $b->getMoyenne()) ? 1 : -1;
+                        });
+                    }
+
+                    // recherche par noms
+                    if (isset($_GET['q']) && !empty($_GET['q'])) {
+                        $motCle = strtolower($_GET['q']);
+                        $filtre = [];
+                        foreach ($etudiants as $unEtudiant) {
+                            $nomComplet = strtolower($unEtudiant->getNom() . ' ' . $unEtudiant->getPrenom());
+                            if (strpos($nomComplet, $motCle) !== false) {
+                                $filtre[] = $unEtudiant;
+                            }
+                        }
+                        $etudiants = $filtre;
+                    }
+
+                    require __DIR__ . '/../../views/Listes.php'; 
+                }
 
 
-                    //cette fontion va permettre de filter les etudiant ayant eu >=10 ou <10.
+              public function exportPdf(): void
+{
+                    while (ob_get_level()) { ob_end_clean(); }
+
+                    // On ne passe PAS par getEtudiants() qui fait des echo
+                    $stmt = $this->db->query("SELECT * FROM etudiants");
+                    $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+                    $html = '<h1 style="text-align:center;">Liste des Etudiants - IAI</h1>';
+                    $html .= '<p>Total: '.count($rows).' | '.date('d/m/Y').'</p>';
+                    $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+                    $html .= '<tr><th>Matricule</th><th>Nom</th><th>Prenom</th><th>Filiere</th><th>Moyenne</th></tr>';
+                    
+                    foreach($rows as $r){
+                        $html .= '<tr>';
+                        $html .= '<td>'.$r['matricule'].'</td>';
+                        $html .= '<td>'.$r['nom'].'</td>';
+                        $html .= '<td>'.$r['prenom'].'</td>';
+                        $html .= '<td>'.$r['filiere'].'</td>';
+                        $html .= '<td>'.$r['moyenne'].'</td>';
+                        $html .= '</tr>';
+                    }
+                    $html .= '</table>';
+
+                    $dompdf = new \Dompdf\Dompdf();
+                    $dompdf->loadHtml($html);
+                    $dompdf->setPaper('A4', 'landscape');
+                    $dompdf->render();
+                    $dompdf->stream("liste_etudiants.pdf", ["Attachment" => false]);
+                    exit;
+                }
+
+
+                    //cette fontion va permettre de filtrer les etudiant ayant eu >=10 ou <10.
                     public function Admis(): void{
                         $etudiants= $this->getEtudiants();
                          $admis= array_filter($etudiants, function($e){
@@ -114,7 +165,7 @@
                     }
 
 
-
+                    // ajouter un nouvel etudiant
                    public function Creer(){ 
                         $nom = $_POST['nom']; 
                         $prenom = $_POST['prenom']; 
@@ -142,6 +193,21 @@
                     }
 
 
+                    public function Supprimer(): void{
+                        $matricule= $_GET['matricule'] ?? '';
+
+                        if ($matricule === '') {
+                            die("Matricule invalide");
+                        }
+
+                        $stmt= $this-> db-> prepare("DELETE FROM etudiants WHERE matricule = ?");
+                        $stmt-> execute([$matricule]);
+
+                        $_SESSION['message']= "Etudiant $matricule supprimé !";
+                        header('Location: index.php?page=listes');
+
+                        exit;
+                    }
 
 
                     public function getStat(): array{
@@ -179,5 +245,39 @@
                         ];
                     }
 
+                    public function getMatricule(string $matricule){
+
+                        $stmt= $this-> db-> prepare ("SELECT * FROM etudiants WHERE matricule= ?");
+                        $stmt-> execute([$matricule]);
+                        return $stmt->fetch(\PDO::FETCH_ASSOC);
+                    }
+
+                    public function Editer(): void{
+
+                        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                            $matricule= $_POST['matricule'];
+                            $nom= $_POST['nom'];
+                            $prenom= $_POST['prenom'];
+                            $filiere= $_POST['filiere'];
+                            $moyenne= $_POST['moyenne'];
+
+                            $stmt= $this-> db-> prepare('UPDATE etudiants SET nom=?, prenom=?, filiere=?, moyenne=? WHERE matricule=?');
+                            $stmt-> execute([$nom, $prenom, $filiere, $moyenne, $matricule]);
+
+                            header('location: index.php?page=listes');
+                            exit;
+                        }
+
+                        $matricule= $_GET['matricule'] ?? '';
+                        $etudiant= $this->getMatricule($matricule);
+
+                        if (!$etudiant) {
+                            die("etudiant introuvable");
+                        }
+
+                        require __DIR__. '/../../views/editer.php';
+                    }
+
                 }
+
 ?>

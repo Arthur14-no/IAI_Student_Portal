@@ -1,4 +1,6 @@
-<?php $stats = $this->getStat(); ?>
+
+<?php $stats = $this->getStat(); ?> 
+
 <style>
 .stats-grid {
   display: grid;
@@ -18,13 +20,13 @@
 .admis { border-left: 5px solid #22c55e; }
 .echoue { border-left: 5px solid #ef4444; }
 .taux { border-left: 5px solid #3b82f6; }
-.moy { border-left: 5px solid #2c0e48; }
-</style>
+.total { border-left: 5px solid #793ab5; }
+</style> 
 
 
 <h2>__DASHBOARD__</h2><br/>
 <div class="stats-grid">
-  <div class="card"><span>Total</span><b><?= $stats['total'] ?></b></div>
+  <div class="card total"><span>Total</span><b><?= $stats['total'] ?></b></div>
   <div class="card admis"><span>Admis</span><b><?= $stats['admis'] ?></b></div>
   <div class="card echoue"><span>Échoués</span><b><?= $stats['echoues'] ?></b></div>
   <div class="card taux"><span>Taux</span><b><?= $stats['taux'] ?>%</b></div>
@@ -46,17 +48,18 @@
 <body bgcolor="silver"  align="center">
     
     <nav>
-       <p>
-        <a href="index.php?page=admis">liste des admis</a>
-        <a href="index.php?page=echoue">Listes des echoues</a>
-        <a href="index.php?page=ajouter">Ajouter un nouveau etudiant</a>
-       </p>
+       <p style="margin-top:20px; text-align:center;">
+        <a href="index.php?page=admis" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white; ">liste des admis</a>
+        <a href="index.php?page=echoue" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Listes des echoues</a>
+        <a href="index.php?page=ajouter" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Ajouter un nouveau etudiant</a>
+        <a href="index.php?page=export_pdf" target="_blank" style="padding:5px 10px; background:red; color:white; text-decoration:none; border:1px solid black;">Exporter PDF</a>
+        </p>
     </nav>
 
     <nav>
-       <p>
-         <a href="index.php?page=listes&tri=moyenne">Moyennes 2>1.  </a>
-        <a href="index.php?page=listes&tri=mention">Mention</a>
+       <p style="margin-top:20px; text-align:center;">
+        <a href="index.php?page=listes&tri=moyenne" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Moyennes par ordre de grandeur</a>
+        <a href="index.php?page=listes&tri=mention" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Mention</a>
        </p>
     </nav>
 
@@ -76,8 +79,27 @@
         <h2>LISTE DES ETUDIANTS</h2>
     
     <?php foreach ($etudiants as $liste): ?>
-    <p> <?= $liste-> Presenter() ?> - <?= $liste-> Moyenne() ?> </p>
-    <?php endforeach; ?>
+    <p> <?= $liste-> Presenter() ?> - <?= $liste-> Moyenne() ?> - <a href="index.php?page=editer&matricule=<?= $liste-> getMatricul() ?> ">Modifier un etudiant</a>
+     <a href="index.php?page=supprimer&matricule=<?= $liste-> getMatricul() ?>" onclick= "return confirm('Voulez vraiment supprimer : <?= $liste-> getNom() ?> ? Action irreversible !')" style= "color: red; margin-left:8px;" >Supprimer </a></p>
+    
+     <?php endforeach; ?>
+
+<div style="margin-top:20px; text-align:center;">
+
+    <?php for($i = 1; $i <= $totalPages; $i++): ?>
+        <?php if($i == $pageActuelle): ?>
+
+            <strong style="padding:5px 10px; background:#000; color:#fff;"><?= $i ?></strong>
+        <?php else: ?>
+
+            <a href="index.php?page=listes&p=<?= $i ?><?= isset($_GET['tri']) ? '&tri='.$_GET['tri'] : '' ?><?= isset($_GET['q']) ? '&q='.$_GET['q'] : '' ?>" 
+               style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">
+               <?= $i ?>
+            </a>
+        <?php endif; ?>
+    <?php endfor; ?>
+</div>
+
         
 </body>
 </html>

@@ -22,6 +22,25 @@
         }
 
 
+        if($page == 'export_pdf'){
+                (new \App\Controllers\EtudiantController())-> exportPdf();
+                exit;
+        }
+
+
+        if ($page === 'editer') {
+                (new \App\Controllers\EtudiantController())-> Editer();
+        
+                exit;
+        }
+
+        if ($page === 'supprimer') {
+                (new \App\Controllers\EtudiantController())-> Supprimer();
+
+                exit;
+        }
+
+
 
         if ($page === 'listes') {
                 $controller-> Listes();

@@ -1,30 +1,29 @@
 <?php
-    class Database{
-        private $host="localhost";
-        private $dbname= "iai_studentportal";
-        private $username= "root";
-        private $password= "";
-        private $conn;
+declare(strict_types=1);
+namespace App\config;
 
+class Database{
+    private string $host = "localhost";
+    private string $dbname = "iai_studentportal";
+    private string $username = "root";
+    private string $password = "";
+    private ?\PDO $conn = null; 
 
-        public function getConnexion() {
-            $this-> conn= null;
+    public function getConnexion(): ?\PDO {
+        $this->conn = null;
 
-            try {
-            $this->conn= new PDO("mysql:host=".$this->host.";dbname=".$this->dbname.";charset=utf8",
+        try {
+            $this->conn = new \PDO("mysql:host=".$this->host.";dbname=".$this->dbname.";charset=utf8",
             $this->username,
             $this->password);
 
-            $this-> conn-> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this-> conn-> setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-            }
-            catch (PDOExceptation $e) {
-                
-                die('Erreur de connexion a la BD');
-            }
-
-            return $this-> conn;
+            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->conn->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
         }
-    }
+        catch (\PDOException $e) {
+            die('Erreur de connexion a la BD : ' . $e->getMessage());
+        }
 
-?>
+        return $this->conn;
+    }
+}

@@ -11,12 +11,11 @@ Projet PHP de gestions des etudaints de IAI.
 - **Recherche instantanée :** Par Nom / Prénom
 - **Listes intelligentes :** Page Admis / Échoués séparées
 - **Tri :** Par mentions et moyennes (2>1)
-- **Modèle OOP :** Classe `Etudiant` avec `match()` PHP 8 pour le calcul de mention (Excellent, Très Bien, Bien, Assez Bien, Échec)
+- **Modèle POO :** Classe `Etudiant` avec `match()` PHP 8 pour le calcul de mention (Excellent, Très Bien, Bien, Assez Bien, Échec)
 
 ## Technologies:
 - PHP/Mysql (PDO)
 - Composer
-- MVC de base
 - MVC fait maison (Controllers / Models / Views / config/Database.php)
 - HTML / CSS (des codes generer pour la v2)
 - Git / GitHub
@@ -35,4 +34,4 @@ Projet PHP de gestions des etudaints de IAI.
 --------  
 --------
 
-By @A14-###_ DRAKATORZE #/# Arthur14-non.
+By @A14-###_ DRAKATORZE #/# Arthur14-no.
