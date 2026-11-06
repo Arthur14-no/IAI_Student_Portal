@@ -1,105 +1,96 @@
+<?php require __DIR__ . '/layout/header.php'; ?>
+<?php $stats = $this->getStat(); ?>
 
-<?php $stats = $this->getStat(); ?> 
+<!-- DASHBOARD STATS - version IAI pro -->
+<div class="stats-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;">
+  <a href="index.php?page=listes" class="stat-card-link">
+    <div class="stat-card">
+      <span>TOTAL</span><strong><?= $stats['total'] ?></strong>
+    </div>
+  </a>
 
-<style>
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  max-width: 700px;
-  margin: 15px auto;
-}
-.card {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  font-family: sans-serif;
-}
-.card b { font-size: 22px; display: block; }
-.admis { border-left: 5px solid #22c55e; }
-.echoue { border-left: 5px solid #ef4444; }
-.taux { border-left: 5px solid #3b82f6; }
-.total { border-left: 5px solid #793ab5; }
-</style> 
+  <a href="index.php?page=admis" class="stat-card-link">
+    <div class="stat-card">
+      <span>ADMIS</span><strong><?= $stats['admis'] ?></strong>
+    </div>
+  </a>
 
+  <a href="index.php?page=echoue" class="stat-card-link">
+    <div class="stat-card">
+      <span>ÉCHOUÉS</span><strong><?= $stats['echoues'] ?></strong>
+    </div>
+  </a>
 
-<h2>__DASHBOARD__</h2><br/>
-<div class="stats-grid">
-  <div class="card total"><span>Total</span><b><?= $stats['total'] ?></b></div>
-  <div class="card admis"><span>Admis</span><b><?= $stats['admis'] ?></b></div>
-  <div class="card echoue"><span>Échoués</span><b><?= $stats['echoues'] ?></b></div>
-  <div class="card taux"><span>Taux</span><b><?= $stats['taux'] ?>%</b></div>
-</div>
-<div style="text-align:center; margin-bottom:15px;">
-  Moyenne générale de la classe : <b><?= $stats['moyenneClasse'] ?> / 20</b>
+  <a href="index.php?page=admis" class="stat-card-link">
+    <div class="stat-card">
+      <span>TAUX D'ADMISSION</span><strong><?= $stats['taux'] ?>%</strong>
+    </div>
+  </a>
 </div>
 
 
+<!-- FILTRES -->
+<!--<div class="card" style="margin-bottom:20px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+  <a href="index.php?page=listes" class="btn btn-secondary">Toute la liste</a>
+  <a href="index.php?page=admis" class="btn btn-secondary">Liste admis</a>
+  <a href="index.php?page=echoue" class="btn btn-secondary">Liste échoués</a>
+  <a href="index.php?page=ajouter" class="btn btn-primary">+ Ajouter</a>
+  <a href="index.php?page=export_pdf" target="_blank" class="btn btn-danger">Export PDF</a>
+</div>-->
+
+<!-- BARRE OUTILS FUSIONNÉE - Recherche + Tri + Export -->
+<div class="card toolbar">
+  <!-- À gauche : Recherche -->
+  <form action="index.php" method="GET" class="toolbar-search">
+    <input type="hidden" name="page" value="listes">
+    <input type="hidden" name="tri" value="<?= $_GET['tri'] ?? 'moyenne' ?>">
+    <input class="input-iai" type="text" name="q" placeholder="Rechercher par nom / prénom" value="<?= isset($_GET['q']) ? $_GET['q'] : '' ?>">
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+  </form>
+
+  <!-- À droite : Actions -->
+  <div class="toolbar-actions">
+    <a href="index.php?page=listes&tri=nom" class="btn btn-primary">Tri Nom A-Z</a>
+    <a href="index.php?page=listes&tri=moyenne" class="btn btn-primary">Tri Moyenne</a>
+    <a href="index.php?page=export_pdf" target="_blank" class="btn btn-primary">Export PDF</a>
+  </div>
+</div>
 
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portail Etudiants</title>
-</head>
-<body bgcolor="silver"  align="center">
-    
-    <nav>
-       <p style="margin-top:20px; text-align:center;">
-        <a href="index.php?page=admis" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white; ">liste des admis</a>
-        <a href="index.php?page=echoue" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Listes des echoues</a>
-        <a href="index.php?page=ajouter" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Ajouter un nouveau etudiant</a>
-        <a href="index.php?page=export_pdf" target="_blank" style="padding:5px 10px; background:red; color:white; text-decoration:none; border:1px solid black;">Exporter PDF</a>
-        </p>
-    </nav>
+</div>
 
-    <nav>
-       <p style="margin-top:20px; text-align:center;">
-        <a href="index.php?page=listes&tri=moyenne" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Moyennes par ordre de grandeur</a>
-        <a href="index.php?page=listes&tri=mention" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Mention</a>
-       </p>
-    </nav>
+  <table class="table-iai">
+    <thead><tr><th>MATRICULE</th><th>NOM_COMPLET</th><th>AGE</th><th>FILIERE</th><TH>MOYENNE</TH><TH>MENTION</TH><TH>ACTION</TH></tr></thead>
+    <tbody>
+      <?php foreach ($etudiants as $e): ?>
+      <tr>
+        <td><?= $e->getMatricul() ?></td>
+        <td><?= $e->getNom() ?> <?= $e->getPrenom() ?></td>
+        <td><?= $e->getAge() ?> ans</td>
+        <td><?= $e->getFilier() ?></td>
+        <td><?= $e->getMoyenne() ?></td>
+        <td><span class="badge <?= $e->isAdmis() ? 'badge-admis' : 'badge-echoue' ?>"><?= $e->getMention() ?></span></td>
 
-         <h2>RECHERCHE PAR NOM/PRENOM</h2>
-    <form action="index.php" method="GET"> 
+          <td>
+              <a href="index.php?page=editer&matricule=<?= $e->getMatricul() ?>" class="btn btn-secondary">Modifier</a>
+              <a href="index.php?page=supprimer&matricule=<?= $e->getMatricul() ?>" class="btn btn-danger" onclick="return confirm('Voulez vraiment supprimer : <?= $e-> getMatricul() ?>')">Suppr.</a>
+          </td>
 
-        <p>
-            <input type="hidden" name="page" id="page" value="listes">
-            <fieldset>
-                <legend>Veuiller saisir le nom/prenom</legend>
+      </tr>
+      <?php endforeach; ?>
+    </tbody>
 
-                <input type="text" name="q" id="q" value="<?= isset($_GET['q']) ? $_GET['q'] : '' ?>">
-                <button type="submit">Rechercher</button>
-            </fieldset>
-        </p>
+  </table>
 
-        <h2>LISTE DES ETUDIANTS</h2>
-    
-    <?php foreach ($etudiants as $liste): ?>
-    <p> <?= $liste-> Presenter() ?> - <?= $liste-> Moyenne() ?> - <a href="index.php?page=editer&matricule=<?= $liste-> getMatricul() ?> ">Modifier un etudiant</a>
-     <a href="index.php?page=supprimer&matricule=<?= $liste-> getMatricul() ?>" onclick= "return confirm('Voulez vraiment supprimer : <?= $liste-> getNom() ?> ? Action irreversible !')" style= "color: red; margin-left:8px;" >Supprimer </a></p>
-    
-     <?php endforeach; ?>
-
-<div style="margin-top:20px; text-align:center;">
-
-    <?php for($i = 1; $i <= $totalPages; $i++): ?>
-        <?php if($i == $pageActuelle): ?>
-
-            <strong style="padding:5px 10px; background:#000; color:#fff;"><?= $i ?></strong>
-        <?php else: ?>
-
-            <a href="index.php?page=listes&p=<?= $i ?><?= isset($_GET['tri']) ? '&tri='.$_GET['tri'] : '' ?><?= isset($_GET['q']) ? '&q='.$_GET['q'] : '' ?>" 
-               style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">
-               <?= $i ?>
-            </a>
-        <?php endif; ?>
+  <div class="pagination">
+    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+      <?php if ($i == $pageActuelle): ?>
+        <strong><?= $i ?></strong>
+      <?php else: ?>
+        <a href="?page=listes&tri=<?= $_GET['tri'] ?? 'moyenne' ?>&q=<?= $_GET['q'] ?? '' ?>&p=<?= $i ?>" class="btn <?= ($i == $pageActuelle) ? 'btn-primary' : 'btn-secondary' ?>"><?= $i ?></a>
+      <?php endif; ?>
     <?php endfor; ?>
+  </div>
 </div>
 
-        
-</body>
-</html>
+<?php require __DIR__ . '/layout/footer.php'; ?>

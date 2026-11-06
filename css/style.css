@@ -1,0 +1,251 @@
+/* IAI 2026 - Thème Pro */
+:root {
+  --iai-blue: #1E3A8A;
+  --iai-blue-light: #1E3A8A;
+  --iai-gold: #FFC857;
+  --bg: #F6F7FB;
+  --white: #fff;
+  --text: #1F2937;
+  --border: #E5E7EB;
+  --success: #10B981;
+  --danger: #EF4444;
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+/* LAYOUT */
+.iai-nav { background: var(--iai-blue); color: white; padding: 16px 0; }
+.iai-nav .container { display: flex; justify-content: space-between; align-items: center; }
+.iai-logo { font-weight: 800; font-size: 1.2rem; letter-spacing: .5px; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.main-content { padding: 30px 0; min-height: 80vh; }
+
+/* COMPONENTS */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,.04); }
+.table-iai { width: 100%; border-collapse: collapse; }
+.table-iai th { background: #F9FAFB; text-align: left; padding: 12px; font-size: .85rem; text-transform: uppercase; color: #6B7280; }
+.table-iai td { padding: 14px 12px; border-top: 1px solid var(--border); }
+.table-iai tr:hover { background: #F9FAFB; }
+
+.badge { padding: 4px 10px; border-radius: 999px; font-size: .75rem; font-weight: 700; }
+.badge-admis { background: #D1FAE5; color: #065F46; }
+.badge-echoue { background: #FEE2E2; color: #991B1B; }
+
+.btn { display: inline-block; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; text-decoration: none; transition: .2s; }
+.btn-primary { background: var(--iai-blue); color: white; }
+.btn-primary:hover { background: var(--iai-blue-light); }
+.btn-danger { background: #FFF1F2; color: var(--danger); }
+.btn-secondary { background: white; border: 1px solid var(--border); color: var(--text); }
+
+.form-group { margin-bottom: 16px; }
+.input-iai { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; }
+.input-iai:focus { outline: none; border-color: var(--iai-blue); box-shadow: 0 0 0 3px rgba(10,36,99,.1); }
+
+.pagination { display: flex; gap: 6px; margin-top: 20px; justify-content: flex-end; }
+.pagination a, .pagination strong { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); text-decoration: none; color: var(--text); }
+.pagination strong { background: var(--iai-blue); color: white; border-color: var(--iai-blue); }
+
+.iai-footer { text-align: center; padding: 20px; background: var(--iai-blue); color: #9CA3AF; font-size: .85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+
+/* ULTRA PRO - Tableaux Admis / Echoues */
+.table-iai{
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+.table-iai th{
+  text-align: center !important;
+  background: #113597;
+  color: #fff;
+  padding: 14px 10px;
+}
+.table-iai td{
+  padding: 14px 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+.table-iai tbody tr:nth-child(even){
+  background: #F9FAFB;
+}
+.table-iai tbody tr:hover{
+  background: #EEF2FF;
+}
+
+
+/* === COULEURS SÉPARÉES : FOOTER vs EN-TÊTE TABLEAU === */
+
+/* 1. FOOTER SEUL - c'est lui que tu as rendu bleu */
+ .iai-footer{
+  background: #3759a7; /* Mets le bleu que tu veux pour le footer ici */
+  color: #fff;
+}
+
+/* 2. EN-TÊTE DU TABLEAU SEUL - MATRICULE, NOM, etc */
+.table-iai thead th{
+  background: #3759a7; /* Mets une autre couleur ici si tu veux, ex: #111827 pour noir, #0f766e pour vert foncé */
+  color: #fff;
+}
+
+/* 3. BORDS DU TABLEAU - pour le rendre plus pro */
+.table-iai{
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden; /* Obligatoire pour que les coins arrondis marchent */
+}
+.table-iai td{
+  border-bottom: 1px solid #e5e7eb;
+}
+.table-iai tbody tr:last-child td{
+  border-bottom: none; /* On enlève la dernière ligne pour pas faire double bord */
+}
+
+
+/* === CARTES DASHBOARD - style d'avant + cliquable === */
+.stats-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card-link{
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
+}
+
+.stat-card{
+  background: #fff;
+  border-left: 4px solid #0A2463;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.stat-card span{
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.stat-card strong{
+  font-size: 22px;
+  color: #111827;
+  line-height: 1;
+}
+
+.stat-card-link:hover .stat-card{
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+
+/* === NAV GLOBALE === */
+.iai-subnav{
+  background: #fff;
+  padding: 12px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+.nav-btn{
+  text-decoration: none;
+  color: #374151;
+  background: #f3f4f6;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.nav-btn.active{
+  background: #0A2463;
+  color: #fff;
+}
+.nav-btn-add.active{
+  background: #0A2463;
+  color: #fff;
+}
+
+
+/* === BARRE OUTILS FUSIONNÉE === */
+.toolbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+.toolbar-search{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+  min-width: 260px;
+}
+.toolbar-search .input-iai{
+  flex: 1;
+  margin: 0;
+}
+.toolbar-actions{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.toolbar-actions .btn{
+  margin: 0;
+  white-space: nowrap;
+}
+
+
+/* === PAGINATION 1 - 2 CENTRÉE === */
+.pagination{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0 10px 0;
+  width: 100%;
+}
+.pagination a{
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 14px;
+}
+.pagination a.active{
+  background: #0A2463;
+  color: #fff;
+}
+
+ /* === FOOTER TOUJOURS EN BAS === 
+body{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+}
+.main-content{
+  flex: 1;
+}
+.footer-iai{
+  width: 100%;
+  margin: 0;
+}
+*/

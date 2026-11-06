@@ -46,47 +46,41 @@
                 }
                         
                 
-                public function listes(): void { 
-                    // pagination de la liste des etudiants
-                    $pageActuelle = isset($_GET['p']) ? (int)$_GET['p'] : 1; 
-                    if ($pageActuelle < 1) $pageActuelle = 1; 
-                    $parPage = 5; 
+                public function listes(): void {
+                    // 1. pagination
+                    $pageActuelle = isset($_GET['p']) ? (int)$_GET['p'] : 1;
+                    if ($pageActuelle < 1) $pageActuelle = 1;
+                    $parPage = 5;
 
-                    // compter avec $this->db
-                    $stmtCount = $this-> db-> query("SELECT COUNT(*) as total FROM etudiants");
+                    $stmtCount = $this->db->query("SELECT COUNT(*) as total FROM etudiants");
                     $totalEtudiants = (int)$stmtCount->fetch()['total'];
-                    $totalPages = (int)ceil($totalEtudiants / $parPage); 
-                    $offset = ($pageActuelle - 1) * $parPage; 
+                    $totalPages = (int)ceil($totalEtudiants / $parPage);
+                    $offset = ($pageActuelle - 1) * $parPage;
 
-                    // recuperer 5 étudiants avec $this->db
-                    $stmt = $this->db->prepare("SELECT * FROM etudiants ORDER BY moyenne DESC LIMIT :limit OFFSET :offset");
+                    // 2. LE FIX DU TRI - c'est ici que ça change
+                    $tri = $_GET['tri'] ?? 'nom'; // par défaut A-Z
+                    $orderBy = ($tri === 'moyenne') ? "moyenne DESC" : "nom ASC, prenom ASC";
+
+                    $stmt = $this->db->prepare("SELECT * FROM etudiants ORDER BY $orderBy LIMIT :limit OFFSET :offset");
                     $stmt->bindValue(':limit', $parPage, \PDO::PARAM_INT);
                     $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
                     $stmt->execute();
                     $etudiantsArray = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                    
-                    //  retransformer les valeur en objets apre lexecution evac la bd 
+
+                    // 3. retransformer en objets (tu gardes ton code)
                     $etudiants = [];
                     foreach($etudiantsArray as $row){
-                        $etudiants[]= new \App\Models\Etudiant(
-                        $row['nom'],
-                        $row['prenom'],
-                        (int)$row['age'],
-                        (float)$row['moyenne'] ?? 20,
-                        $row['filiere'] ?? $row['mention'],
-                        $row['matricule']
+                        $etudiants[] = new \App\Models\Etudiant(
+                            $row['nom'],
+                            $row['prenom'],
+                            (int)$row['age'],
+                            (float)$row['moyenne'] ?? 20,
+                            $row['filiere'] ?? $row['mention'],
+                            $row['matricule']
                         );
                     }
 
-                    // tri par moyenne
-                    if (isset($_GET['tri']) && $_GET['tri'] === 'moyenne') {
-                        usort($etudiants, function($a, $b){
-                            if ($a->getMoyenne() == $b->getMoyenne()) return 0;
-                            return ($a->getMoyenne() < $b->getMoyenne()) ? 1 : -1;
-                        });
-                    }
-
-                    // recherche par noms
+                    // 4. recherche par noms (tu gardes ton code)
                     if (isset($_GET['q']) && !empty($_GET['q'])) {
                         $motCle = strtolower($_GET['q']);
                         $filtre = [];
@@ -99,39 +93,51 @@
                         $etudiants = $filtre;
                     }
 
-                    require __DIR__ . '/../../views/Listes.php'; 
+                    require __DIR__ . '/../../views/Listes.php';
                 }
 
 
-              public function exportPdf(): void
-{
+                public function exportPdf(): void {
                     while (ob_get_level()) { ob_end_clean(); }
 
-                    // On ne passe PAS par getEtudiants() qui fait des echo
-                    $stmt = $this->db->query("SELECT * FROM etudiants");
+                    $stmt = $this->db->query("SELECT * FROM etudiants ORDER BY nom ASC, prenom ASC");
                     $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-                    $html = '<h1 style="text-align:center;">Liste des Etudiants - IAI</h1>';
-                    $html .= '<p>Total: '.count($rows).' | '.date('d/m/Y').'</p>';
-                    $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
-                    $html .= '<tr><th>Matricule</th><th>Nom</th><th>Prenom</th><th>Filiere</th><th>Moyenne</th></tr>';
-                    
-                    foreach($rows as $r){
-                        $html .= '<tr>';
-                        $html .= '<td>'.$r['matricule'].'</td>';
-                        $html .= '<td>'.$r['nom'].'</td>';
-                        $html .= '<td>'.$r['prenom'].'</td>';
-                        $html .= '<td>'.$r['filiere'].'</td>';
-                        $html .= '<td>'.$r['moyenne'].'</td>';
-                        $html .= '</tr>';
-                    }
-                    $html .= '</table>';
+                    // FPDF 1.9.0 que tu viens d'installer
+                    $pdf = new \FPDF();
+                    $pdf->AddPage();
+                    $pdf->SetFont('Arial','B',16);
+                    $pdf->Cell(0,10,'IAI Student Portal - Liste des Etudiants',0,1,'C');
+                    $pdf->SetFont('Arial','',10);
+                    $pdf->Cell(0,8,'Total: '.count($rows).' | '.date('d/m/Y'),0,1,'C');
+                    $pdf->Ln(5);
 
-                    $dompdf = new \Dompdf\Dompdf();
-                    $dompdf->loadHtml($html);
-                    $dompdf->setPaper('A4', 'landscape');
-                    $dompdf->render();
-                    $dompdf->stream("liste_etudiants.pdf", ["Attachment" => false]);
+                    // En-tête tableau
+                    $pdf->SetFont('Arial','B',10);
+                    $pdf->Cell(25,10,'Matricule',1);
+                    $pdf->Cell(35,10,'Nom',1);
+                    $pdf->Cell(35,10,'Prenom',1);
+                    $pdf->Cell(15,10,'Age',1);
+                    $pdf->Cell(25,10,'Filiere',1);
+                    $pdf->Cell(25,10,'Moyenne',1);
+                    $pdf->Cell(30,10,'Mention',1);
+                    $pdf->Ln();
+
+                    // Lignes
+                    $pdf->SetFont('Arial','',10);
+                    foreach($rows as $r){
+                        $mention = $r['moyenne'] >= 10 ? 'Admis' : 'Echoue';
+                        $pdf->Cell(25,8,$r['matricule'],1);
+                        $pdf->Cell(35,8,$r['nom'],1);
+                        $pdf->Cell(35,8,$r['prenom'],1);
+                        $pdf->Cell(15,8,$r['age'],1);
+                        $pdf->Cell(25,8,$r['filiere'],1);
+                        $pdf->Cell(25,8,$r['moyenne'],1);
+                        $pdf->Cell(30,8,$mention,1);
+                        $pdf->Ln();
+                    }
+
+                    $pdf->Output('D','liste_etudiants.pdf');
                     exit;
                 }
 
@@ -150,9 +156,9 @@
 
                     public function Echoue(): void{
                         $etudiants= $this->getEtudiants();
-                        $echoue= array_filter($etudiants, function($e){
-                        return $e->getMoyenne() <10;
-                });
+                       $echoue = array_filter($etudiants, function($e){ return $e->getMoyenne() <10; });
+                            usort($echoue, function($a,$b){ return $b->getMoyenne() <=> $a->getMoyenne(); });
+
 
                     require __DIR__ . '/../../views/ListesEchoue.php';
                     }
@@ -166,31 +172,41 @@
 
 
                     // ajouter un nouvel etudiant
-                   public function Creer(){ 
-                        $nom = $_POST['nom']; 
-                        $prenom = $_POST['prenom']; 
-                        $age = (int)($_POST['age'] ?? 20); 
-                        $moyenne = (float)$_POST['moyenne']; 
-                        $filiere = $_POST['filiere']; 
+                   public function Creer(){
+                        $nom = trim($_POST['nom'] ?? '');
+                        $prenom = trim($_POST['prenom'] ?? '');
+                        $age = (int)($_POST['age'] ?? 20);
+                        $moyenne = (float)($_POST['moyenne'] ?? 0);
+                        $filiere = $_POST['filiere'] ?? 'G.L';
 
-                        $matricule = 'IAI' . str_pad((string)rand(1,9999), 4, '0', STR_PAD_LEFT); 
+                        // validations IAI
+                        if($nom === '' || $prenom === '') { 
+                            header('Location: index.php?page=ajouter&error=nom'); exit; 
+                        }
+                        if($age < 15 || $age > 60) $age = 20;
+                        if($moyenne < 0 || $moyenne > 20) $moyenne = 0;
+                        if(!in_array($filiere, ['G.L','S.R'])) $filiere = 'G.L';
 
-                        $query = "INSERT INTO etudiants (matricule, nom, prenom, age, moyenne, filiere) 
-                                VALUES (:matricule, :nom, :prenom, :age, :moyenne, :filiere)"; 
+                        // Matricule SANS espace et unique
+                        $matricule = 'IAI' . str_pad((string)rand(1,9999), 4, '0', STR_PAD_LEFT);
 
-                        $stmt = $this->db->prepare($query); 
-                        $stmt->execute([ 
-                            'matricule' => $matricule, 
-                            'nom' => $nom, 
-                            'prenom' => $prenom, 
-                            'age' => $age, 
-                            'moyenne' => $moyenne, 
+                        $query = "INSERT INTO etudiants (matricule, nom, prenom, age, moyenne, filiere)
+                                VALUES (:matricule, :nom, :prenom, :age, :moyenne, :filiere)";
+
+                        $stmt = $this->db->prepare($query);
+                        $stmt->execute([
+                            'matricule' => $matricule,
+                            'nom' => $nom,
+                            'prenom' => $prenom,
+                            'age' => $age,
+                            'moyenne' => $moyenne,
                             'filiere' => $filiere
-                        ]); 
+                        ]);
 
-                        header('Location: index.php?page=listes&tri=mention'); 
-                        exit; 
+                        header('Location: index.php?page=listes&tri=moyenne');
+                        exit;
                     }
+
 
 
                     public function Supprimer(): void{

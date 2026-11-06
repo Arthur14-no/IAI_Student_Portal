@@ -1,25 +1,58 @@
-<!DOCTYPE html>
-<html lang="">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LISTES DES ADMIS</title>
-</head>
-<body bgcolor="silver" align="center">
+<?php require __DIR__ . '/layout/header.php'; ?>
 
-     <nav>
-       <p style="margin-top:20px; text-align:center;">
-        <a href="index.php?page=echoue" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Listes des echoues</a>
-        <a href="index.php?page=listes" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;" >liste des etudiants</a>
-        <a href="index.php?page=ajouter" style="padding:5px 10px; border:1px solid #000; text-decoration:none; background:white;">Ajouter un nouveau etudiant</a>
-     </p>
-     </nav>
-    
-     <h2>ADMIS</h2>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+  <h1>Liste des Admis</h1>
+  <a href="index.php?page=listes" class="btn btn-secondary">↩ Retour</a>
+</div>
 
-    <?php foreach ($admis as $ad): ?>
-    <p> <?= $ad-> Presenter() ?> - <?= $ad-> Moyenne()?> </p>
-    <?php endforeach; ?>
+<!--<div class="card">
+  <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+    <a href="index.php?page=listes" class="btn btn-secondary">Toute la liste</a>
+    <a href="index.php?page=admis" class="btn btn-primary">Liste admis</a>
+    <a href="index.php?page=echoue" class="btn btn-secondary">Liste échoués</a>
+    <a href="index.php?page=ajouter" class="btn btn-secondary">+ Ajouter</a>
+  </div>-->
 
-</body>
-</html>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+    <h2 style="color:#16a34a; margin:0;"> ADMIS (<?= count($admis) ?> étudiants)</h2>
+    <input type="text" id="searchAdmis" placeholder="🔍 Rechercher..." class="input-iai" style="max-width:280px; margin:0;">
+  </div>
+
+  <table class="table-iai">
+    <thead>
+      <tr>
+        <th>Matricule</th>
+        <th>Nom & Prénom</th>
+        <th>Moyenne</th>
+        <th>Mention</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody id="tbodyAdmis">
+      <?php foreach ($admis as $ad): ?>
+      <tr>
+        <td><strong><?= $ad->getMatricul() ?></strong></td>
+        <td><?= $ad->getNom() ?> <?= $ad->getPrenom() ?></td>
+        <td><strong><?= $ad->getMoyenne() ?> /20</strong></td>
+        <td><?= $ad->getMention() ?></td>
+        <td><span class="badge badge-admis">Admis</span></td>
+      </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+
+  <?php if(empty($admis)): ?>
+    <p style="text-align:center; padding:20px;">Aucun admis pour le moment.</p>
+  <?php endif; ?>
+</div>
+
+<script>
+document.getElementById('searchAdmis').addEventListener('input', function(){
+  let q = this.value.toLowerCase();
+  document.querySelectorAll('#tbodyAdmis tr').forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+</script>
+
+<?php require __DIR__ . '/layout/footer.php'; ?>
